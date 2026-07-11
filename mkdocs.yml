@@ -1,0 +1,69 @@
+site_name: AttackMap
+site_url: https://docs.matthewd.xyz/
+site_description: >-
+  Documentation for AttackMap — local-first defensive security analysis for
+  real codebases.
+repo_url: https://github.com/mlaify/AttackMap
+repo_name: mlaify/AttackMap
+copyright: Copyright &copy; 2026 mlaify
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+    - toc.follow
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - Install: install.md
+      - Quickstart: quickstart.md
+  - Guide:
+      - Scanning & output: scanning.md
+      - Analyzers: analyzers.md
+      - AI review (LLM): llm.md
+      - CI & pull requests: ci.md
+      - macOS app: gui.md
+  - Reference:
+      - CLI reference: cli.md
+  - Extending:
+      - Analyzer SDK: sdk.md
