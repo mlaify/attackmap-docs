@@ -28,6 +28,26 @@ A scan writes a monolithic report plus focused sub-artifacts:
 
 Findings carry **stable IDs**, which is what makes baseline diffing reliable.
 
+## CI workflow security
+
+Every scan also inspects `.github/workflows/*.yml` — a real attack surface that
+static app scanners usually miss — and raises findings for supply-chain and
+code-execution risks:
+
+| Issue | What it catches | Severity |
+| --- | --- | --- |
+| Script injection | An attacker-controlled context (`github.event.*.{title,body,message,…}`, `github.head_ref`) interpolated into a `run:` step, so a crafted issue/PR title runs arbitrary shell. | High |
+| `pull_request_target` + PR checkout | Building untrusted fork code with the base repo's secrets in scope. | High |
+| Unpinned action | `uses: org/action@tag\|branch` instead of a pinned commit SHA. | Medium (branch) / Low (semver tag) |
+| Secret in `run:` | `${{ secrets.* }}` expanded into a shell step — pass it via `env:` instead. | Medium |
+| Over-broad permissions | `permissions: write-all` at the workflow or job level. | Medium |
+| Self-hosted runner on PR | A self-hosted runner reachable from `pull_request`/`pull_request_target`. | High / Medium |
+
+A hardened workflow — SHA-pinned actions, scoped `permissions:`, secrets via
+`env:`, no untrusted-context interpolation — produces nothing. These findings
+flow through SARIF, the diff gate, and [suppression](ci.md#suppressing-findings)
+like any other.
+
 ## Baseline diffing & PR gating
 
 Compare a fresh scan against a prior report to see what changed:
