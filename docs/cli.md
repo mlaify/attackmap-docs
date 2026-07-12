@@ -54,6 +54,11 @@ See [AI review](llm.md) for details and credential resolution.
 | `--diff-output <file>` | Where to write the Markdown diff. |
 | `--fail-on-new-high` | Exit non-zero on new HIGH findings (needs `--baseline`). |
 | `--pr-comment <file>` | Write a Markdown PR summary comment. |
+| `--no-suppress` | Ignore all suppressions (baseline + inline) for a full audit. |
+| `--suppress-file <file>` | Override the `.attackmap-suppress.yaml` location. |
+
+See [Suppressing findings](ci.md#suppressing-findings) for the suppression file
+format and inline `attackmap:ignore` directives.
 
 ## Other commands
 
