@@ -48,6 +48,18 @@ A hardened workflow — SHA-pinned actions, scoped `permissions:`, secrets via
 flow through SARIF, the diff gate, and [suppression](ci.md#suppressing-findings)
 like any other.
 
+## Unauthenticated state-changing routes
+
+Raw auth signals are noisy — a large repo emits hundreds. AttackMap fuses them
+into one conclusion: the public, state-changing (`POST/PUT/PATCH/DELETE`) routes
+with **no authentication control on their own chain**. The control is resolved
+*per route* — an Express middleware argument or global `app.use`, a FastAPI
+`Depends(...)` / auth decorator / router dependency, a Spring `@PreAuthorize` /
+`@Secured` — so a route doesn't inherit a neighbor's auth code. Routes behind a
+control produce nothing, and the sensitive categories (webhook, admin, upload,
+auth) keep their own findings. Each evidence line names the route and the
+resolved chain.
+
 ## Baseline diffing & PR gating
 
 Compare a fresh scan against a prior report to see what changed:
