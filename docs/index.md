@@ -15,7 +15,7 @@ attackmap analyze /path/to/repo --output reports
 ## What it does
 
 - **Attack-surface mapping** — routes, entry points, exposure, and auth signals across many languages.
-- **Taint analysis** — import-graph data-flow from untrusted sources to injection sinks (SQLi, SSRF, SSTI, deserialization, and more).
+- **Taint analysis** — import-graph data-flow from untrusted sources to injection sinks (SQLi, SSRF, SSTI, deserialization, and more), with **sanitizer awareness**: a chain that passes through a known escaper/validator/binder (`shlex.quote`, `secure_filename`, `is_safe_url`, driver escapers, …) is downgraded instead of firing a false positive.
 - **Exploitability scoring** — fuses signals (including CVEs on the path) into a ranked, honest view of what matters.
 - **Dependency CVEs** — cross-reference your SBOM against [OSV.dev](https://osv.dev) (`--cve`).
 - **AI review** — narrative defensive review, vulnerability-hypothesis hunting, and remediation suggestions, grounded in cited evidence (`--llm` / `--hunt` / `--remediate`).
