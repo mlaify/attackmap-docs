@@ -11,11 +11,28 @@ rather than inventing findings. All LLM modes are **opt-in**.
 | `--llm` | A narrative defensive review (`defensive-review-llm.md`). |
 | `--hunt` | Ranked, human-verifiable **exploit-chain hypotheses** — leads, not detections (`vulnerability-hypotheses.md`). |
 | `--hunt --verify` | Adjudicates each hypothesis against the cited source: CONFIRMED / REFUTED / NEEDS REVIEW. |
+| `--triage` | Clusters, de-duplicates, and ranks the *existing* findings into a prioritized shortlist (`triage.md`); degrades to a deterministic score-ordered fallback when no LLM backend is available. |
 | `--remediate` | Review-first fix suggestions per finding (`remediation.md`). |
 
 !!! warning "Hunt output is hypotheses, not detections"
     `--hunt` produces leads a human must confirm. It won't assign CVEs or emit
     exploit code, and each lead lists exactly what to verify.
+
+### The verify jury
+
+`--verify` scales from a single adjudication pass into a jury, so a plausible-
+but-wrong lead doesn't survive on one model's say-so:
+
+| Flag | Effect |
+| --- | --- |
+| `--verify-votes <n>` | N independent skeptics adjudicate each lead; CONFIRMED only on a strict majority (default 3; 1 = single pass). |
+| `--hunt-lenses <n>` | N generation passes, each specialised in a distinct failure mode (auth-bypass, TOCTOU, IDOR, deserialization, SSRF, secret-misuse), deduped before verifying. |
+| `--hunt-rounds <n>` | Loop generation for up to N rounds, accumulating new leads while a **completeness critic** seeds each round with untried angles; stops early once a round finds nothing new. |
+| `--hunt-budget <tokens>` | Cap total hunt output tokens across all rounds. |
+
+These compose — e.g. `--hunt --verify --verify-votes 3 --hunt-lenses 4 --hunt-rounds 3`.
+They also adjudicate the **speculative** reach that [`--recall`](scanning.md#recall-mode)
+and [cross-repo analysis](scanning.md#cross-repo-fleet-analysis) surface.
 
 ## Providers
 

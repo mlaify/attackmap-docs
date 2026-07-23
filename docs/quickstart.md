@@ -48,3 +48,28 @@ attackmap analyze . --baseline prev/attackmap-report.json \
 ```
 
 See [CI & pull requests](ci.md) for the GitHub Action and PR bot.
+
+## 6. Scan a fleet
+
+Pass more than one repository to analyze a set of services together and surface
+the bugs that live in the **seams** between them:
+
+```bash
+attackmap analyze ./service-a ./service-b ./gateway --output reports
+```
+
+Each repo gets its own `reports/<repo>/`, plus a `reports/fleet-summary.md` that
+links callers to the routes they hit and flags cross-boundary flows,
+trust-assumption gaps, and cross-repo anomalies. See
+[Cross-repo fleet analysis](scanning.md#cross-repo-fleet-analysis).
+
+## 7. Widen the net (recall)
+
+`--recall` widens taint discovery and enumerates capability-reach, marking the
+extra reach speculative; pair it with the verifier to adjudicate:
+
+```bash
+attackmap analyze . --recall --hunt --verify
+```
+
+See [Recall mode](scanning.md#recall-mode).
