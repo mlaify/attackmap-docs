@@ -2,7 +2,7 @@
 
 Documentation site for [AttackMap](https://github.com/mlaify/AttackMap), built
 with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) and served
-at **[docs.matthewd.xyz](https://docs.matthewd.xyz)**.
+at **[docs.fhrp.org](https://docs.fhrp.org)**.
 
 ## Local development
 
@@ -15,17 +15,29 @@ mkdocs build          # output to ./site
 ## Deploy
 
 Pushing to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml),
-which builds the site and publishes it to the `gh-pages` branch. GitHub Pages
-serves that branch; [`docs/CNAME`](docs/CNAME) pins the custom domain.
+which builds the site with `mkdocs build --strict` and rsyncs `./site/` to the
+InterServer docroot for `docs.fhrp.org`.
+
+This repo previously published to GitHub Pages via `mkdocs gh-deploy`. That was
+replaced when the site moved to InterServer; there is no longer a `gh-pages`
+branch or a `docs/CNAME` file.
 
 ### One-time setup
 
-1. **Pages source** — Settings → Pages → Deploy from branch → `gh-pages` / `root`
-   (after the first workflow run creates the branch).
-2. **DNS** — add a `CNAME` record at your DNS provider:
-   `docs.matthewd.xyz` → `mlaify.github.io`.
-3. **Custom domain** — Settings → Pages → set `docs.matthewd.xyz`; enable
-   "Enforce HTTPS" once the certificate provisions.
+1. **Repository secrets** — Settings → Secrets and variables → Actions:
+
+   | Secret | Value |
+   |---|---|
+   | `DEPLOY_SSH_KEY` | Private half of an SSH keypair authorized on the InterServer account |
+   | `DEPLOY_KNOWN_HOSTS` | Output of `ssh-keyscan -H <host>` — pins the host key |
+   | `DEPLOY_HOST` | InterServer hostname or IP |
+   | `DEPLOY_USER` | SSH user |
+   | `DEPLOY_PATH` | Absolute docroot path for `docs.fhrp.org` |
+   | `DEPLOY_PORT` | SSH port (optional, defaults to `22`) |
+
+2. **DNS** — `docs.fhrp.org` A record → the InterServer IP, at Cloudflare.
+3. **TLS** — issue a certificate for `docs.fhrp.org` on the server, or set the
+   Cloudflare SSL mode to Full (strict) with an origin certificate installed.
 
 ## Content
 

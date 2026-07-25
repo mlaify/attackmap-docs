@@ -1,1 +1,6 @@
-mkdocs-material>=9.5
+# Pinned deliberately. MkDocs 2.0 removes the plugin system and the theming
+# system with no migration path, so an unpinned range would eventually break
+# this build. Bump these on purpose, not by surprise.
+mkdocs==1.6.1
+mkdocs-material==9.7.7
+pymdown-extensions==11.0.1
