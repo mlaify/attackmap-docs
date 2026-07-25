@@ -1,3 +1,7 @@
 site/
 .cache/
 __pycache__/
+
+# OS files — these get published if they reach a docroot
+.DS_Store
+Thumbs.db
