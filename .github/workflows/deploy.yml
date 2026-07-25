@@ -1,29 +1,30 @@
 name: Deploy docs
 
+# Builds the MkDocs Material site and publishes it to the gh-pages branch, which
+# GitHub Pages serves at docs.matthewd.xyz (docs/CNAME pins the domain).
+#
 # Pull requests run `build` only — a full `mkdocs build --strict`, which fails on
-# broken internal links and bad nav references, with no server access. Pushes to
-# main additionally run `deploy`, which rsyncs the artifact to the InterServer
-# docroot for docs.fhrp.org.
+# broken internal links and bad nav references, with no write permissions.
+# Pushes to main additionally run `deploy`.
 #
-# This replaced `mkdocs gh-deploy` when the site moved off GitHub Pages; there is
-# no gh-pages branch and no CNAME file any more.
-#
-# The split into two jobs is deliberate: `environment: production` cannot be
-# applied conditionally, so a single job would make pull requests wait on the
-# production approval gate.
+# The split into two jobs is deliberate: the deploy job needs contents:write to
+# push the gh-pages branch, and PRs should never hold that. Job-level
+# `permissions:` keeps the elevated scope off the build job entirely.
 
 on:
   push:
     branches: [main]
+  # Deliberately unfiltered. A `branches:` filter here matches the PR's BASE
+  # branch, so `[main]` silently skips CI on any stacked PR — one targeting a
+  # feature branch rather than main.
   pull_request:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: docs-fhrp-org-${{ github.ref }}
+  group: docs-pages-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 defaults:
@@ -34,9 +35,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -52,69 +53,33 @@ jobs:
         run: |
           test -f site/index.html || { echo "::error::site/index.html missing"; exit 1; }
           test -d site/search     || { echo "::error::site/search missing — search index not built"; exit 1; }
+          test -f site/CNAME      || { echo "::error::site/CNAME missing — Pages would drop the custom domain"; exit 1; }
           echo "Build output looks sane ($(find site -type f | wc -l) files)."
-
-      # include-hidden-files guards against a future hidden file being dropped
-      # silently; the default is false.
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: docs-site
-          path: site/
-          include-hidden-files: true
-          retention-days: 7
-          if-no-files-found: error
 
   deploy:
     needs: build
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
-    environment: production
+    permissions:
+      contents: write
     steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
         with:
-          name: docs-site
-          path: site
+          fetch-depth: 0
 
-      - name: Confirm artifact survived the round trip
-        run: |
-          test -f site/index.html || { echo "::error::index.html missing from artifact"; exit 1; }
-          echo "Artifact intact ($(find site -type f | wc -l) files)."
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
 
-      - name: Configure SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
-        run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
+      - run: pip install -r requirements.txt
 
-      # -rlptD is -a minus owner/group, which shared hosting will not let us
-      # set. acme-challenge is excluded so an in-flight cert renewal survives.
-      - name: Deploy to InterServer
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '22' }}
-        run: |
-          rsync -rlptDvz --human-readable \
-            --delete \
-            --exclude '.well-known/acme-challenge/' \
-            --exclude '.DS_Store' \
-            -e "ssh -i ~/.ssh/deploy_key -p ${DEPLOY_PORT} -o StrictHostKeyChecking=yes -o UserKnownHostsFile=~/.ssh/known_hosts" \
-            site/ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
-
-      - name: Clean up SSH key
-        if: always()
-        run: rm -f ~/.ssh/deploy_key
-
-      - name: Verify live site
-        run: |
-          sleep 5
-          curl -sSfI https://docs.fhrp.org/ | head -1
+      # gh-deploy rebuilds and force-pushes gh-pages. --no-history keeps that
+      # branch from growing without bound.
+      #
+      # No live-site curl check afterwards on purpose: docs.matthewd.xyz sits
+      # behind Cloudflare, which issues a JS challenge to non-browser clients
+      # and returns 403 to Actions runners — that produced a red X on a deploy
+      # that had actually succeeded.
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force --no-history
