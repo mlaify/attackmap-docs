@@ -45,9 +45,34 @@ no longer a `gh-pages` branch or a `docs/CNAME` file.
 5. **GitHub Pages** — set the source to None so it stops serving the old
    `gh-pages` content and releases the custom-domain claim.
 
-> `DEPLOY_PATH` must point at the `docs.matthewd.xyz` docroot, not the apex
-> site's. The deploy uses `rsync --delete`, so a wrong path deletes whatever
-> lives there. Dry-run first with `rsync -n`.
+### Required: mark the docroot
+
+The deploy refuses to run unless the destination contains a sentinel file. Run
+once, on the server:
+
+```bash
+touch <docs.matthewd.xyz docroot>/.deploy-ok
+```
+
+Server-side only — never committed, never shipped, excluded from `--delete`.
+
+### Deletion limit
+
+`rsync --delete` is capped. If a deploy would delete more than 100 paths it
+aborts **before deleting anything** and prints the list. Raise the
+`MAX_DELETIONS` repository variable for a legitimate large restructure.
+
+### Why these guards exist
+
+On 2026-07-26 the sibling repo's `DEPLOY_PATH` was empty. `"${DEPLOY_PATH}/"`
+expanded to `/`, and `rsync --delete` ran against the account root, deleting 6679
+paths including all server-side mail. The deploy job now validates the path
+(non-empty, absolute, no `..`, not a system directory, ≥3 levels deep), requires
+the `.deploy-ok` sentinel, gates on a dry-run deletion count, and passes
+`--max-delete` as a backstop.
+
+`DEPLOY_PATH` here must point at the `docs.matthewd.xyz` docroot, not the apex
+site's.
 
 ## Dependencies
 
