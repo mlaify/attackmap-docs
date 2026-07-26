@@ -15,19 +15,39 @@ mkdocs build          # output to ./site
 ## Deploy
 
 Pushing to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml),
-which builds the site and publishes it to the `gh-pages` branch. GitHub Pages
-serves that branch; [`docs/CNAME`](docs/CNAME) pins the custom domain.
+which builds the site with `mkdocs build --strict` and rsyncs `./site/` to the
+InterServer docroot for `docs.matthewd.xyz`.
 
-Pull requests run the build only — `mkdocs build --strict`, with no write
-permissions — so a broken internal link fails the PR instead of shipping a 404.
+Pull requests run the build only — no secrets, no server access — so a broken
+internal link fails the PR instead of shipping a 404.
+
+This repo previously published to GitHub Pages via `mkdocs gh-deploy`. There is
+no longer a `gh-pages` branch or a `docs/CNAME` file.
 
 ### One-time setup
 
-1. **Pages source** — Settings → Pages → Deploy from branch → `gh-pages` / `root`.
-2. **DNS** — add a `CNAME` record at your DNS provider:
-   `docs.matthewd.xyz` → `mlaify.github.io`.
-3. **Custom domain** — Settings → Pages → set `docs.matthewd.xyz`; enable
-   "Enforce HTTPS" once the certificate provisions.
+1. **Repository secrets** — Settings → Secrets and variables → Actions:
+
+   | Secret | Value |
+   |---|---|
+   | `DEPLOY_SSH_KEY` | Private half of an SSH keypair authorized on the InterServer account |
+   | `DEPLOY_KNOWN_HOSTS` | Output of `ssh-keyscan -H <host>` — pins the host key |
+   | `DEPLOY_HOST` | InterServer hostname or IP |
+   | `DEPLOY_USER` | SSH user |
+   | `DEPLOY_PATH` | Absolute docroot path for `docs.matthewd.xyz` |
+   | `DEPLOY_PORT` | SSH port (optional, defaults to `22`) |
+
+2. **Environment** — create a `production` environment, or remove the
+   `environment: production` line from the deploy job.
+3. **DNS** — `docs.matthewd.xyz` A record → the InterServer IP, at Cloudflare.
+4. **TLS** — install a Cloudflare Origin CA certificate on the server and set
+   the SSL mode to Full (strict). Do not use Flexible.
+5. **GitHub Pages** — set the source to None so it stops serving the old
+   `gh-pages` content and releases the custom-domain claim.
+
+> `DEPLOY_PATH` must point at the `docs.matthewd.xyz` docroot, not the apex
+> site's. The deploy uses `rsync --delete`, so a wrong path deletes whatever
+> lives there. Dry-run first with `rsync -n`.
 
 ## Dependencies
 
