@@ -2,6 +2,15 @@ site/
 .cache/
 __pycache__/
 
+# The build creates a venv rather than installing into the system interpreter —
+# Python 3.12+ images mark that externally managed (PEP 668) and refuse.
+.venv/
+
+# Node is here only to pin wrangler (see package.json) — the site is built by
+# MkDocs. package-lock.json IS committed so the deploy tool version is fixed.
+node_modules/
+.wrangler/
+
 # OS files — these get published if they reach a docroot
 .DS_Store
 Thumbs.db

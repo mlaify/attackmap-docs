@@ -14,65 +14,85 @@ mkdocs build          # output to ./site
 
 ## Deploy
 
-Pushing to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml),
-which builds the site with `mkdocs build --strict` and rsyncs `./site/` to the
-InterServer docroot for `docs.matthewd.xyz`.
+Cloudflare **Workers Builds** clones this repo on push, runs the build itself,
+and deploys the result as Workers static assets. There is no GitHub Actions
+workflow, no SSH key, no rsync, and no origin server.
 
-Pull requests run the build only — no secrets, no server access — so a broken
-internal link fails the PR instead of shipping a 404.
+| | |
+|---|---|
+| Worker | `docs-matthewd-xyz` |
+| Config | [`wrangler.jsonc`](wrangler.jsonc) |
+| Production branch | `main` → `https://docs.matthewd.xyz` |
+| Any other branch | preview URL, not promoted to production |
 
-This repo previously published to GitHub Pages via `mkdocs gh-deploy`. There is
-no longer a `gh-pages` branch or a `docs/CNAME` file.
+This repo previously published to GitHub Pages via `mkdocs gh-deploy`, then to an
+InterServer docroot by rsync. There is no `gh-pages` branch and no `docs/CNAME`.
 
-### One-time setup
+### Build settings (Cloudflare dashboard)
 
-1. **Repository secrets** — Settings → Secrets and variables → Actions:
+Workers & Pages → `docs-matthewd-xyz` → Settings → Build:
 
-   | Secret | Value |
-   |---|---|
-   | `DEPLOY_SSH_KEY` | Private half of an SSH keypair authorized on the InterServer account |
-   | `DEPLOY_KNOWN_HOSTS` | Output of `ssh-keyscan -H <host>` — pins the host key |
-   | `DEPLOY_HOST` | InterServer hostname or IP |
-   | `DEPLOY_USER` | SSH user |
-   | `DEPLOY_PATH` | Absolute docroot path for `docs.matthewd.xyz` |
-   | `DEPLOY_PORT` | SSH port (optional, defaults to `22`) |
+| Setting | Value |
+|---|---|
+| Build command | `npm run build:cf` |
+| Deploy command | `npx wrangler deploy` |
+| Non-production deploy command | `npx wrangler versions upload` |
+| Root directory | *(blank)* |
 
-2. **Environment** — create a `production` environment, or remove the
-   `environment: production` line from the deploy job.
-3. **DNS** — `docs.matthewd.xyz` A record → the InterServer IP, at Cloudflare.
-4. **TLS** — install a Cloudflare Origin CA certificate on the server and set
-   the SSL mode to Full (strict). Do not use Flexible.
-5. **GitHub Pages** — set the source to None so it stops serving the old
-   `gh-pages` content and releases the custom-domain claim.
+`build:cf` lives in [`package.json`](package.json) so the actual steps stay in
+version control and the dashboard holds only the entry point. It installs the
+pinned requirements, runs `mkdocs build --strict`, deletes source maps, then runs
+[`scripts/check-build.sh`](scripts/check-build.sh).
 
-### Required: mark the docroot
+mkdocs-material ships ~1.3 MB of source maps for its own bundled CSS/JS. These
+are not published; `build:cf` deletes them and `check-build.sh` fails the build
+if any survive. A Cloudflare `.assetsignore` cannot do this — it has to sit in
+the assets directory root (`site/`), and MkDocs does not copy dotfiles from
+`docs/`.
 
-The deploy refuses to run unless the destination contains a sentinel file. Run
-once, on the server:
+`--strict` still turns a broken internal link or bad nav reference into a build
+failure, and a failed build never becomes a deployment — so a typo cannot ship a
+404. That guarantee now applies to preview branches too.
+
+### Toolchain pinning
+
+| Tool | Pinned to | Where |
+|---|---|---|
+| Python | 3.12 | [`.python-version`](.python-version) |
+| MkDocs + Material | see below | [`requirements.txt`](requirements.txt) |
+| wrangler | 4.114.0 | `devDependencies` in `package.json` |
+
+Node exists in this repo **only** to pin wrangler; the site is built by MkDocs.
+Without `.python-version` the build image would use its default (3.13.x).
+
+`build:cf` installs into a `.venv` rather than the system interpreter. Python
+3.12+ images mark that externally managed (PEP 668) and a bare
+`pip install -r requirements.txt` fails there.
+
+### Headers
+
+[`docs/_headers`](docs/_headers) is the single source of truth for security and
+cache headers. MkDocs copies it to `site/_headers`, Cloudflare consumes it at
+deploy time, and it is not itself served.
+
+This used to come from the origin (LiteSpeed/cPanel). There is no origin now, so
+if a Cloudflare Transform Rule also sets these headers, remove one side —
+duplicated security headers are worse than none.
+
+### Local preview through the real asset router
 
 ```bash
-touch <docs.matthewd.xyz docroot>/.deploy-ok
+npm run build:cf && npm run preview
 ```
 
-Server-side only — never committed, never shipped, excluded from `--delete`.
+`preview` runs `wrangler dev`, which serves `site/` through the same asset router
+as production — trailing-slash behaviour, the 404 page, and `_headers` all apply.
+`mkdocs serve` reproduces none of those.
 
-### Deletion limit
-
-`rsync --delete` is capped. If a deploy would delete more than 100 paths it
-aborts **before deleting anything** and prints the list. Raise the
-`MAX_DELETIONS` repository variable for a legitimate large restructure.
-
-### Why these guards exist
-
-On 2026-07-26 the sibling repo's `DEPLOY_PATH` was empty. `"${DEPLOY_PATH}/"`
-expanded to `/`, and `rsync --delete` ran against the account root, deleting 6679
-paths including all server-side mail. The deploy job now validates the path
-(non-empty, absolute, no `..`, not a system directory, ≥3 levels deep), requires
-the `.deploy-ok` sentinel, gates on a dry-run deletion count, and passes
-`--max-delete` as a backstop.
-
-`DEPLOY_PATH` here must point at the `docs.matthewd.xyz` docroot, not the apex
-site's.
+Cutover steps, the DNS swap ordering constraint, and rollback are in the sibling
+repo's runbook:
+`mlaify/mlaify.github.io` → `docs/superpowers/ops/cloudflare-workers-runbook.md`.
+It covers both sites.
 
 ## Dependencies
 

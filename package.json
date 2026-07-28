@@ -1,0 +1,15 @@
+{
+  "name": "attackmap-docs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "docs.matthewd.xyz — AttackMap documentation. Node is here only to pin wrangler, the Cloudflare deploy tool; the site itself is built by MkDocs (see requirements.txt).",
+  "license": "MIT",
+  "scripts": {
+    "build:cf": "python3 -m venv .venv && .venv/bin/pip install --disable-pip-version-check -q -r requirements.txt && .venv/bin/mkdocs build --strict && find site -name '*.map' -delete && bash scripts/check-build.sh",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "4.114.0"
+  }
+}

@@ -1,0 +1,44 @@
+# Response headers for Workers static assets.
+#
+# MkDocs copies non-Markdown files from docs/ verbatim into site/, so this
+# lands at site/_headers, which is where Cloudflare looks for it. The file is
+# consumed at deploy time and is NOT itself served — /_headers returns 404.
+# Verified locally.
+#
+# This is now the ONLY place these headers are set. On InterServer they came
+# from the origin (LiteSpeed/cPanel), and moving to Workers drops that origin
+# entirely. If a Cloudflare Transform Rule also sets any of them, remove one
+# side — duplicated security headers are worse than none.
+#
+# Limits: 100 rules, 2,000 characters per line.
+
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: same-origin
+
+# mkdocs-material fingerprints these (main.<hash>.min.css,
+# bundle.<hash>.min.js, search.<hash>.min.js), so the filename changes whenever
+# the content does and they can be cached forever.
+/assets/stylesheets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/javascripts/bundle.*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/javascripts/workers/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Deliberately NOT long-cached, because these filenames are stable while their
+# contents are not:
+#   /assets/javascripts/lunr/*  — vendored lunr, changes on a Material bump
+#                                 with no filename change
+#   /search/search_index.json   — rebuilt from the docs on every build
+# Cloudflare's default for assets is `public, max-age=0, must-revalidate`,
+# which is what we want; these rules are explicit so a future blanket cache
+# rule does not silently capture them and pin a stale search index.
+/assets/javascripts/lunr/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+/search/*
+  Cache-Control: public, max-age=0, must-revalidate
