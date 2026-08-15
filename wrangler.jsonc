@@ -1,5 +1,5 @@
 {
-  // docs.matthewd.xyz — MkDocs Material, served as Workers static assets.
+  // docs.mlaify.io — MkDocs Material, served as Workers static assets.
   //
   // There is deliberately no `main` and no Worker script. With `assets` and no
   // `main`, requests are served entirely by Cloudflare's asset worker: no
@@ -9,7 +9,7 @@
   // and runs the build itself) — see README.md. There is no GitHub Actions
   // deploy any more, and no rsync.
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "docs-matthewd-xyz",
+  "name": "docs-mlaify-io",
   "compatibility_date": "2026-07-28",
 
   "assets": {
@@ -28,7 +28,7 @@
 
   "routes": [
     {
-      "pattern": "docs.matthewd.xyz",
+      "pattern": "docs.mlaify.io",
       "custom_domain": true
     }
   ],
