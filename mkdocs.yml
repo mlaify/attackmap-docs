@@ -1,11 +1,11 @@
 site_name: AttackMap
-site_url: https://docs.matthewd.xyz/
+site_url: https://docs.mlaify.io/
 site_description: >-
   Documentation for AttackMap — local-first defensive security analysis for
   real codebases.
 repo_url: https://github.com/mlaify/AttackMap
 repo_name: mlaify/AttackMap
-copyright: Copyright &copy; 2026 Matt D.
+copyright: Copyright &copy; 2026 Grayson Fire
 
 theme:
   name: material

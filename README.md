@@ -2,7 +2,7 @@
 
 Documentation site for [AttackMap](https://github.com/mlaify/AttackMap), built
 with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) and served
-at **[docs.matthewd.xyz](https://docs.matthewd.xyz)**.
+at **[docs.mlaify.io](https://docs.mlaify.io)**.
 
 ## Local development
 
@@ -20,9 +20,9 @@ workflow, no SSH key, no rsync, and no origin server.
 
 | | |
 |---|---|
-| Worker | `docs-matthewd-xyz` |
+| Worker | `docs-mlaify-io` |
 | Config | [`wrangler.jsonc`](wrangler.jsonc) |
-| Production branch | `main` → `https://docs.matthewd.xyz` |
+| Production branch | `main` → `https://docs.mlaify.io` |
 | Any other branch | preview URL, not promoted to production |
 
 This repo previously published to GitHub Pages via `mkdocs gh-deploy`, then to an
@@ -30,7 +30,7 @@ InterServer docroot by rsync. There is no `gh-pages` branch and no `docs/CNAME`.
 
 ### Build settings (Cloudflare dashboard)
 
-Workers & Pages → `docs-matthewd-xyz` → Settings → Build:
+Workers & Pages → `docs-mlaify-io` → Settings → Build:
 
 | Setting | Value |
 |---|---|
