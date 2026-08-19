@@ -5,7 +5,7 @@ site_description: >-
   real codebases.
 repo_url: https://github.com/mlaify/AttackMap
 repo_name: mlaify/AttackMap
-copyright: Copyright &copy; 2026 Grayson Fire
+copyright: Copyright &copy; 2026 M D
 
 theme:
   name: material
