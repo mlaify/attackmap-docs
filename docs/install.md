@@ -14,12 +14,6 @@ AttackMap needs **Python 3.11+**. Pick whichever fits your setup.
     pip install git+https://github.com/mlaify/AttackMap.git
     ```
 
-=== "Docker"
-
-    ```bash
-    docker run --rm -v "$PWD:/repo" ghcr.io/mlaify/attackmap:latest analyze /repo
-    ```
-
 ## Optional: LLM support
 
 The AI-review modes work through the `claude` / `codex` CLIs with no extra
