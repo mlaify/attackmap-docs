@@ -5,9 +5,10 @@
 > The code remains available for reference, and security reports are still
 > welcome at [security@mlaify.io](mailto:security@mlaify.io).
 
-Documentation site for [AttackMap](https://github.com/mlaify/AttackMap), built
-with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) and served
-at **[docs.mlaify.io](https://docs.mlaify.io)**.
+Documentation source for [AttackMap](https://github.com/mlaify/AttackMap), built
+with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/). The hosted
+site is no longer published — read the pages directly in [`docs/`](docs/), or
+build locally with the steps below.
 
 ## Local development
 
@@ -27,7 +28,7 @@ workflow, no SSH key, no rsync, and no origin server.
 |---|---|
 | Worker | `docs-mlaify-io` |
 | Config | [`wrangler.jsonc`](wrangler.jsonc) |
-| Production branch | `main` → `https://docs.mlaify.io` |
+| Production branch | `main` (site no longer deployed) |
 | Any other branch | preview URL, not promoted to production |
 
 This repo previously published to GitHub Pages via `mkdocs gh-deploy`, then to an
