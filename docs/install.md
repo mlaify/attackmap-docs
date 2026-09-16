@@ -2,22 +2,16 @@
 
 AttackMap needs **Python 3.11+**. Pick whichever fits your setup.
 
-=== "Homebrew"
-
-    ```bash
-    brew install mlaify/tap/attackmap
-    ```
-
 === "pipx"
 
     ```bash
-    pipx install attackmap
+    pipx install git+https://github.com/mlaify/AttackMap.git
     ```
 
 === "pip"
 
     ```bash
-    pip install attackmap
+    pip install git+https://github.com/mlaify/AttackMap.git
     ```
 
 === "Docker"
@@ -33,7 +27,7 @@ install. To use the **API backends** instead, add the LLM extra (pulls in the
 `anthropic` and `openai` SDKs):
 
 ```bash
-pip install "attackmap[llm]"
+pip install "git+https://github.com/mlaify/AttackMap.git#egg=attackmap[llm]"
 ```
 
 See [AI review](llm.md) for how backends and credentials resolve.
@@ -44,16 +38,13 @@ The `all` extra adds every official ecosystem analyzer plugin up front (they
 also auto-install on demand — see [Analyzers](analyzers.md)):
 
 ```bash
-pip install "attackmap[all]"
+pip install "git+https://github.com/mlaify/AttackMap.git#egg=attackmap[all]"
 ```
 
 ## macOS app
 
-Prefer a GUI? Install the native macOS front-end (it drives the same CLI):
-
-```bash
-brew install --cask mlaify/tap/attackmap-app   # installs the CLI too
-```
+Prefer a GUI? Build the native macOS front-end from source (it drives the same
+CLI): [mlaify/AttackMap-mac](https://github.com/mlaify/AttackMap-mac).
 
 See [macOS app](gui.md).
 

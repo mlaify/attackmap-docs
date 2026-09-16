@@ -6,12 +6,9 @@ paths, diagrams, and the AI review without leaving the app.
 
 ## Install
 
-```bash
-brew install --cask mlaify/tap/attackmap-app
-```
-
-The cask depends on the `attackmap` formula, so this installs the CLI too. Update
-both together:
+There is no prebuilt distribution — build the app from source at
+[mlaify/AttackMap-mac](https://github.com/mlaify/AttackMap-mac). It drives the
+`attackmap` CLI, so install that too:
 
 ```bash
 brew upgrade --cask attackmap-app

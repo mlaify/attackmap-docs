@@ -12,7 +12,7 @@ on your machine; nothing is uploaded unless you explicitly enable an LLM backend
 *The macOS app after scanning OWASP Juice Shop — 29 findings, 22 exploitable sinks, and the single most exploitable route→sink path ranked first. See the [macOS app](gui.md#screenshots) page for the full walkthrough.*
 
 ```bash
-brew install mlaify/tap/attackmap
+pip install "git+https://github.com/mlaify/AttackMap.git#egg=attackmap[all]"
 attackmap analyze /path/to/repo --output reports
 ```
 
