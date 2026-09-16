@@ -1,5 +1,10 @@
 # attackmap-docs
 
+> [!NOTE]
+> **Development is paused.** This project is not under active development.
+> The code remains available for reference, and security reports are still
+> welcome at [security@mlaify.io](mailto:security@mlaify.io).
+
 Documentation site for [AttackMap](https://github.com/mlaify/AttackMap), built
 with [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) and served
 at **[docs.mlaify.io](https://docs.mlaify.io)**.
