@@ -21,7 +21,7 @@ install. To use the **API backends** instead, add the LLM extra (pulls in the
 `anthropic` and `openai` SDKs):
 
 ```bash
-pip install "git+https://github.com/mlaify/AttackMap.git#egg=attackmap[llm]"
+pip install "attackmap[llm] @ git+https://github.com/mlaify/AttackMap.git"
 ```
 
 See [AI review](llm.md) for how backends and credentials resolve.
@@ -32,7 +32,7 @@ The `all` extra adds every official ecosystem analyzer plugin up front (they
 also auto-install on demand — see [Analyzers](analyzers.md)):
 
 ```bash
-pip install "git+https://github.com/mlaify/AttackMap.git#egg=attackmap[all]"
+pip install "attackmap[all] @ git+https://github.com/mlaify/AttackMap.git"
 ```
 
 ## macOS app

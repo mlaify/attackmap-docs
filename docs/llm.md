@@ -60,7 +60,7 @@ force `api` / `cli`:
     1. `OPENAI_API_KEY` → the Responses API
     2. the `codex` CLI → your Codex subscription (`codex login`)
 
-The API backends need the LLM extra (`pip install "attackmap[llm]"`); the CLI
+The API backends need the LLM extra (`pip install "attackmap[llm] @ git+https://github.com/mlaify/AttackMap.git"`); the CLI
 backends just need `claude` / `codex` on your `PATH`.
 
 ## Tuning

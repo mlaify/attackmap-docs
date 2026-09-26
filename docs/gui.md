@@ -11,7 +11,7 @@ There is no prebuilt distribution — build the app from source at
 `attackmap` CLI, so install that too:
 
 ```bash
-brew upgrade --cask attackmap-app
+pipx install git+https://github.com/mlaify/AttackMap.git
 ```
 
 Requires macOS 15 (Sequoia) or later.

@@ -12,7 +12,7 @@ on your machine; nothing is uploaded unless you explicitly enable an LLM backend
 *The macOS app after scanning OWASP Juice Shop — 29 findings, 22 exploitable sinks, and the single most exploitable route→sink path ranked first. See the [macOS app](gui.md#screenshots) page for the full walkthrough.*
 
 ```bash
-pip install "git+https://github.com/mlaify/AttackMap.git#egg=attackmap[all]"
+pip install "attackmap[all] @ git+https://github.com/mlaify/AttackMap.git"
 attackmap analyze /path/to/repo --output reports
 ```
 
@@ -34,7 +34,7 @@ attackmap analyze /path/to/repo --output reports
 
 ## Where to go next
 
-- [Install](install.md) — Homebrew, pipx, pip, Docker, or the macOS app.
+- [Install](install.md) — pipx, pip, or the macOS app.
 - [Quickstart](quickstart.md) — your first scan in two minutes.
 - [AI review](llm.md) — Claude or OpenAI/Codex, and how auth resolves.
 - [Analyzer SDK](sdk.md) — write your own ecosystem analyzer.

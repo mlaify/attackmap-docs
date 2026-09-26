@@ -37,7 +37,7 @@ Independent packages under the `mlaify` org, e.g.:
 - `attackmap-analyzer-php-web`, `attackmap-analyzer-php-laminas`
 - `attackmap-analyzer-iac` (Terraform / IaC), and more.
 
-Install them all up front with `pip install "attackmap[all]"`.
+Install them all up front with `pip install "attackmap[all] @ git+https://github.com/mlaify/AttackMap.git"`.
 
 Want coverage for something not listed? The plugin contract is small — see the
 [Analyzer SDK](sdk.md).
