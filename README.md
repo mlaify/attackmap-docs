@@ -30,7 +30,7 @@ workflow, no SSH key, no rsync, and no origin server.
 | Worker | `docs-mlaify-io` |
 | Config | [`wrangler.jsonc`](wrangler.jsonc) |
 | Production branch | `main` → `https://docs.mlaify.io` |
-| Any other branch | preview URL, not promoted to production |
+| Any other branch | built and uploaded as a version; no public preview URL, not promoted to production |
 
 This repo previously published to GitHub Pages via `mkdocs gh-deploy`, then to an
 InterServer docroot by rsync. There is no `gh-pages` branch and no `docs/CNAME`.
@@ -59,7 +59,7 @@ the assets directory root (`site/`), and MkDocs does not copy dotfiles from
 
 `--strict` still turns a broken internal link or bad nav reference into a build
 failure, and a failed build never becomes a deployment — so a typo cannot ship a
-404. That guarantee now applies to preview branches too.
+404. That guarantee applies to non-production branch builds too.
 
 ### Toolchain pinning
 
