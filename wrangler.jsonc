@@ -26,9 +26,9 @@
     "not_found_handling": "404-page"
   },
 
-  // docs.fhrp.org and docs.matthewd.xyz serve the same docs directly (not
-  // redirects) because some services refuse to follow them; canonical URLs
-  // still point at docs.mlaify.io. They must be listed here — `wrangler deploy`
+  // docs.fhrp.org, docs.matthewd.xyz, and docs.mldavis.me serve the same docs
+  // directly (not redirects) because some services refuse to follow them;
+  // canonical URLs still point at docs.mlaify.io. They must be listed here — `wrangler deploy`
   // replaces any domains attached in the dashboard.
   "routes": [
     {
@@ -41,6 +41,10 @@
     },
     {
       "pattern": "docs.matthewd.xyz",
+      "custom_domain": true
+    },
+    {
+      "pattern": "docs.mldavis.me",
       "custom_domain": true
     }
   ],
