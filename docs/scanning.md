@@ -14,8 +14,8 @@ Pass two or more paths for a **fleet scan** (see [below](#cross-repo-fleet-analy
 
 Common options (full list in the [CLI reference](cli.md)):
 
-- `--output <dir>` — where artifacts are written (default: current directory).
-- `--format {all,markdown,json}` — which output formats to emit.
+- `--output <dir>` / `-o` — where artifacts are written (default: `reports`).
+- `--format {all,markdown,json}` — which artifacts to write: `json` (report JSON + SARIF), `markdown` (`*.md` + `*.dot`), or `all` (default).
 - `--module <name>` — restrict to specific analyzers (repeatable). See [Analyzers](analyzers.md).
 - `--cve` — cross-reference dependencies against OSV.dev.
 - `--recall` — widen taint discovery (see [Recall mode](#recall-mode)).
