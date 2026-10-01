@@ -9,16 +9,47 @@ The repo ships a composite action (`action.yml`) that runs a scan, emits SARIF
 
 ```yaml
 name: AttackMap
-on: [pull_request]
+on: pull_request            # not pull_request_target — see below
+permissions:
+  contents: read
+  security-events: write    # SARIF upload
+  pull-requests: write      # only if you post the PR comment
 jobs:
   analyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: mlaify/AttackMap@v0            # pin to a release tag in practice
+      - uses: actions/checkout@<commit-sha>   # pin actions to full commit SHAs
+      - uses: mlaify/AttackMap@<commit-sha>   # e.g. the commit of a release tag
         with:
           path: .
 ```
+
+How the action protects the pipeline (0.4.31+):
+
+- **Use `pull_request`, never `pull_request_target`.** `pull_request_target`
+  runs fork code with your repository's secrets and a write token.
+- **Pin by commit SHA.** The action installs exactly the code your `uses:` ref
+  checks out, and the analyzer plugins it pulls in are pinned to immutable
+  commits. A moved tag or branch can't change what runs.
+- **Inputs never reach the shell unquoted.** They're passed through
+  environment variables, so a branch name or PR title can't inject commands.
+- **Reports are written to `$RUNNER_TEMP/attackmap-reports`**, outside the
+  checkout, so a PR can't plant files or symlinks where reports land.
+  Override with the `output` input.
+- **Only official analyzers load** (`--trusted-analyzers-only`). A dependency
+  that registers an `attackmap.analyzers` entry point can't run inside the scan.
+
+AttackMap also checks *your* workflows and composite actions for these
+mistakes: unpinned `uses:`, `${{ github.event.* }}` or `${{ inputs.* }}` in
+`run:` scripts, `pull_request_target` checkouts, broad permissions and more.
+
+### Installing analyzers with `-m`
+
+`attackmap analyze -m go` uses an installed analyzer. If it isn't installed,
+AttackMap prints the exact pinned `pip install` command and exits. Pass
+`--install-missing`, or confirm at the interactive prompt, to have it install the
+official plugin at its pinned commit. Unknown names are rejected without any
+network access. To vet third-party analyzers, run with `--trusted-analyzers-only`.
 
 ## PR summary bot
 
