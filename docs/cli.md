@@ -3,6 +3,8 @@
 Run `attackmap --help` or `attackmap <command> --help` for the authoritative,
 version-specific list. This page summarizes the common surface.
 
+`attackmap --version` prints the installed version (0.4.30+).
+
 ## `analyze`
 
 ```bash
@@ -22,8 +24,8 @@ invocation is unchanged; the single-repo-only options below (diff, `--llm`,
 
 | Option | Description |
 | --- | --- |
-| `--output <dir>` | Directory for artifacts (default: current dir). |
-| `--format {all,markdown,json}` | Output formats to emit (default `all`). |
+| `--output <dir>` / `-o` | Directory for artifacts (default: `reports`). |
+| `--format {all,markdown,json}` | Which artifacts to write (default `all`). `json` = `attackmap-report.json`, `attackmap-report.sarif`, `defensive-review.json`, `review-context-pack.json` (fleet: `fleet-summary.json`). `markdown` = the `*.md` reports plus `*.dot` diagrams (fleet: `fleet-summary.md`, `fleet-graph.md`). Opt-in outputs (baseline diff, PR comment, LLM passes) are always written. Honored from 0.4.30; earlier versions always wrote everything. |
 | `--progress-format {auto,json,none}` | Progress reporting; `json` = NDJSON events on stderr. |
 | `--no-progress` | Disable the progress bar (equivalent to `none`). |
 
