@@ -63,6 +63,30 @@ force `api` / `cli`:
 The API backends need the LLM extra (`pip install "attackmap[llm] @ git+https://github.com/mlaify/AttackMap.git"`); the CLI
 backends just need `claude` / `codex` on your `PATH`.
 
+### Running on untrusted repositories
+
+The evidence pack is built from the repository you scan, so it can contain
+prompt-injection text. From 0.4.31 the CLI backends are isolated from that
+repository:
+
+- `claude` and `codex` run in an empty temporary directory. They never use the
+  scan root or your shell's working directory, so a scanned repo's
+  `.claude/settings.json` (hooks, permissions), `.mcp.json`, `CLAUDE.md` and
+  `AGENTS.md` are never loaded.
+- `claude` runs with **no tools**, user-level settings only, no MCP servers and
+  no saved session.
+- `codex` runs in a read-only sandbox rooted at that temp dir, without
+  execpolicy rules and with an ephemeral session. Codex has no tool-less mode,
+  so its model can still run *read-only* commands as you. For the strongest
+  isolation with OpenAI, use `--llm-backend api`.
+- Credentials the provider doesn't need (`GITHUB_TOKEN`, `AWS_*`,
+  `SSH_AUTH_SOCK`, `*_PASSWORD`, …) are not passed to the CLI.
+- If your `claude`/`codex` is too old to support these flags, AttackMap refuses
+  the CLI backend instead of running it unhardened. Upgrade the CLI or use
+  `--llm-backend api`.
+
+The API backends send only the evidence pack and never run tools.
+
 ## Tuning
 
 - `--llm-effort {low,medium,high,xhigh,max}` — reasoning effort (default `high`). For OpenAI, `xhigh`/`max` clamp to `high`.
