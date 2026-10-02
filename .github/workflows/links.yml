@@ -24,11 +24,13 @@ jobs:
         with:
           args: >-
             --no-progress
-            --max-retries 3
-            --accept 200,206,429
+            --max-retries 5
+            --retry-wait-time 10
+            --accept 200,206,429,503
             --exclude-path site
             "docs/**/*.md" README.md
           fail: true
-          # Authenticated requests: github.com answers anonymous bulk checks
-          # with 503/429 (first run flagged two valid blob links).
+          # Authenticated requests, and 503 accepted: github.com throttles bulk
+          # checks of blob pages with 503 even when authenticated (both runs
+          # flagged valid links). A dead link is a 404, which still fails.
           token: ${{ secrets.GITHUB_TOKEN }}
