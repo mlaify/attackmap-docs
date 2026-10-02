@@ -65,5 +65,6 @@ nav:
       - macOS app: gui.md
   - Reference:
       - CLI reference: cli.md
+      - Feature availability: feature-availability.md
   - Extending:
       - Analyzer SDK: sdk.md

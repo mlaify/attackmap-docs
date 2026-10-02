@@ -3,7 +3,9 @@
 Run `attackmap --help` or `attackmap <command> --help` for the authoritative,
 version-specific list. This page summarizes the common surface.
 
-`attackmap --version` prints the installed version (0.4.30+).
+`attackmap --version` prints the installed version (0.4.30+). Flags were
+added over many releases; [Feature availability](feature-availability.md) lists
+the minimum CLI version for each.
 
 ## `analyze`
 
@@ -33,7 +35,25 @@ invocation is unchanged; the single-repo-only options below (diff, `--llm`,
 
 | Option | Description |
 | --- | --- |
-| `--module <name>` / `-m` | Restrict to specific analyzer(s); repeatable. Missing official analyzers auto-install. |
+| `--module <name>` / `-m` | Run only the named analyzer(s); repeatable. Also the only way to run an opt-in analyzer (see below). A missing official analyzer is installed, pinned to the commit in AttackMap's plugin lock, only with `--install-missing` or after an interactive confirmation. An unknown name that isn't an official analyzer is an error. |
+| `--install-missing` | Install missing official analyzers named by `--module` without prompting (0.4.31+). |
+| `--trusted-analyzers-only` | Load only official AttackMap analyzer plugins and skip any other installed package that registers one. Also `ATTACKMAP_TRUSTED_ANALYZERS_ONLY=1` (0.4.31+). |
+| `--strict-analyzers` | Fail fast if an analyzer raises or returns an invalid result, instead of skipping it and listing it under `scan.analyzer_errors`. For plugin development and CI (after 0.4.31). |
+
+Without `--module`, every installed analyzer whose `detect()` matches the repo
+runs, in `(priority, name)` order, except **opt-in** analyzers
+(`enabled_by_default=False`). When an opt-in analyzer matches but isn't
+selected, the CLI prints a hint on stderr:
+
+```text
+Opt-in analyzers match this repo but were not run: omeka-s. Enable with -m omeka-s.
+```
+
+If an analyzer fails, the scan continues without it. The console prints
+`Analyzer '<name>' failed and was skipped: …` and `attackmap-report.json` lists
+it under `scan.analyzer_errors`. Opt-in handling, run order and this failure
+isolation ship in the first release after 0.4.31; earlier releases run every
+matching analyzer and abort on the first failure.
 
 ### Dependencies
 
@@ -82,9 +102,55 @@ See [AI review](llm.md) for details and credential resolution.
 See [Suppressing findings](ci.md#suppressing-findings) for the suppression file
 format and inline `attackmap:ignore` directives.
 
+## `suggest`
+
+```bash
+attackmap suggest [path] [--install] [--yes] [--show-installed]
+```
+
+Inspects a repository's manifests, file extensions and framework markers, and
+recommends the official analyzer plugins that fit it (default path `.`). Each
+missing plugin is listed with what matched and the exact `pip install` command,
+pinned to the commit in AttackMap's plugin lock.
+
+| Option | Description |
+| --- | --- |
+| `--install` | After printing, offer to `pip install` the missing recommended plugins. Asks for confirmation (default No). This is the supported way to install plugins for a repo. |
+| `--yes` / `-y` | With `--install`, skip the confirmation prompt (for scripts). |
+| `--show-installed` | Also list recommended plugins that are already installed, marked `(installed)`. |
+
+`--install` refuses to install into a system (non-virtualenv) Python unless
+`ATTACKMAP_ALLOW_SYSTEM_INSTALL=1` is set. Install AttackMap with Homebrew,
+pipx or a venv so plugins land next to it. The command exits 1 if the path
+isn't a directory, you decline the prompt, or a `pip install` fails.
+
+## `bench`
+
+```bash
+attackmap bench [--benchmark <manifest>] [--root <dir>] [-o <dir>] [--fail-under <0-1>]
+```
+
+Scores AttackMap's findings against a labeled ground-truth corpus and prints
+precision, recall and F1 per detector class. It's a contributor and CI tool:
+the default manifest, `evals/benchmark/benchmark.json`, ships in a checkout of
+the [AttackMap repo](https://github.com/mlaify/AttackMap), not in the installed
+package, so run it from the repo root. See
+[docs/benchmark.md](https://github.com/mlaify/AttackMap/blob/main/docs/benchmark.md)
+for the corpus format.
+
+| Option | Description |
+| --- | --- |
+| `--benchmark <path>` | Benchmark manifest (default `evals/benchmark/benchmark.json`). |
+| `--root <dir>` | Directory the manifest's case paths are relative to (default `.`). |
+| `--output <dir>` / `-o` | Also write `benchmark-results.md` and `benchmark-results.json` here. Results are always printed to stdout. |
+| `--fail-under <float>` | Exit 1 if any scored detector class's precision or recall is below this value (0–1). For CI regression gating. |
+
+Exit codes: 2 if the manifest isn't found, 1 if any case failed to scan or the
+`--fail-under` gate fails, 0 otherwise.
+
 ## Other commands
 
 | Command | Description |
 | --- | --- |
 | `attackmap modules [--json]` | List installed analyzer modules. |
-| `attackmap suggest <path>` | Suggest which analyzers fit a repository. |
+| `attackmap rules [--json]` | List every core detector's stable rule id, the value for suppress `rule:` and `attackmap:ignore[...]` (after 0.4.31). |

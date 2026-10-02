@@ -6,26 +6,92 @@ paths, diagrams, and the AI review without leaving the app.
 
 ## Install
 
-There is no prebuilt distribution — build the app from source at
-[mlaify/AttackMap-mac](https://github.com/mlaify/AttackMap-mac). It drives the
-`attackmap` CLI, so install that too:
+Install the notarized app with Homebrew:
 
 ```bash
-pipx install git+https://github.com/mlaify/AttackMap.git
+brew install --cask mlaify/tap/attackmap-app
 ```
+
+The cask depends on the `attackmap` CLI formula, so this also installs the
+CLI (`brew install mlaify/tap/attackmap`). The app drives that CLI rather than
+bundling its own engine. Upgrade both with `brew upgrade`. Signed and
+notarized DMGs are also attached to each
+[GitHub release](https://github.com/mlaify/AttackMap-mac/releases).
 
 Requires macOS 15 (Sequoia) or later.
 
+### Build from source
+
+You need Xcode 16+, [XcodeGen](https://github.com/yonaskolb/XcodeGen) and the
+`attackmap` CLI on your `PATH`:
+
+```bash
+brew install xcodegen mlaify/tap/attackmap
+git clone https://github.com/mlaify/AttackMap-mac.git
+cd AttackMap-mac
+xcodegen generate          # creates AttackMap.xcodeproj from project.yml
+open AttackMap.xcodeproj   # build and run (⌘R)
+```
+
+Re-run `xcodegen generate` after pulling changes that add or rename Swift
+files. See the [AttackMap-mac README](https://github.com/mlaify/AttackMap-mac)
+for details.
+
+### Finding the CLI
+
+The app looks for `attackmap` at the path set in Settings, then on your login
+shell's `PATH`, then in `/opt/homebrew/bin`, `/usr/local/bin` and
+`~/.local/bin`, so Homebrew, pipx and pip installs are all found.
+
 ## Features
 
-- **Repo picker + Run/Cancel** with live progress and ETA.
-- **Analyzers** — Automatic (by language) or pin specific modules.
-- **AI review** — provider (Claude / OpenAI · Codex), model, reasoning, and Fast toggle. API keys are stored in your login Keychain.
-- **Watch mode** — auto re-scan on file changes, with new-vs-resolved deltas.
-- **Result views** — Overview, Findings, Exploitability, Attack paths, Attack surface, Diagrams (rendered Mermaid), Review, and AI Review.
+- **Repo picker, Run and Cancel**, with live per-file progress and ETA.
+- **Analyzers**: Automatic (the engine picks by repo) or pin specific modules.
+- **CVE**: SBOM cross-reference against OSV.dev (`--cve`).
+- **Recall mode** (`--recall`): wider, speculative taint discovery. The extra
+  reach is marked speculative and kept out of the high-severity gate.
+- **Suppression controls**: ignore all suppressions for a full audit
+  (`--no-suppress`) or point at an explicit baseline (`--suppress-file`).
+  Suppressed findings still appear, collapsed, under Findings with their reason.
+- **LLM modes**: Review (`--llm`), Hunt (`--hunt`), Hunt + verify
+  (`--hunt --verify`), Remediate (`--remediate`) and Triage (`--triage`).
+  Provider (Claude or OpenAI · Codex), model, reasoning and a Fast toggle apply
+  to all of them. API keys are stored in your login Keychain.
+- **Verify jury** for Hunt + verify: votes (`--verify-votes`), lenses
+  (`--hunt-lenses`), rounds (`--hunt-rounds`) and a token budget
+  (`--hunt-budget`).
+- **Cross-repo / fleet scans**: select two or more folders to run
+  `attackmap analyze repoA repoB …`. The fleet view shows a per-repo rollup,
+  contract links, cross-boundary (confused-deputy) flows, trust-assumption gaps,
+  cross-repo control anomalies and the fleet graph.
+- **Watch mode**: re-scans automatically (debounced) when files change and
+  shows what's new and what's resolved since the previous scan.
+- **Result views**: Overview, Findings, Exploitability, Attack paths, Attack
+  surface, Diagrams (Mermaid, rendered offline), Review and AI Review.
+- **Recent scans** and **Settings** (CLI path, API keys).
 
-The app feature-detects the installed CLI, so newer options light up as you
-upgrade. Source and issues: [github.com/mlaify/AttackMap-mac](https://github.com/mlaify/AttackMap-mac).
+### Where output goes
+
+The app always runs the CLI with `--format all` and writes into the scanned
+repo:
+
+- single repo: `<repo>/.attackmap-gui/reports/`
+- fleet scan: `<first selected repo>/.attackmap-gui/fleet/` (one subdirectory
+  per repo plus `fleet-summary.json` / `.md`)
+
+These are ordinary AttackMap reports, the same files `attackmap analyze -o`
+writes. Add `.attackmap-gui/` to your `.gitignore`. AttackMap never scans its
+own output, and watch mode ignores it.
+
+### CLI versions
+
+The app feature-detects the installed CLI from `attackmap analyze --help`. An
+option the CLI doesn't support is never passed, and a mode it lacks entirely
+stops with a `brew upgrade attackmap` hint. [Feature
+availability](feature-availability.md) lists the minimum CLI version for each
+option; the app's own thresholds are recall 0.4.20, triage 0.4.15, verify jury
+0.4.16, suppression 0.4.7, fleet 0.4.22 and the OpenAI provider 0.4.3. Source
+and issues: [github.com/mlaify/AttackMap-mac](https://github.com/mlaify/AttackMap-mac).
 
 ## Screenshots
 
