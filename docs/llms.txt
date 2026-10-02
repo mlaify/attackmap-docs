@@ -29,6 +29,7 @@ AttackMap installs from GitHub (`pipx install git+https://github.com/mlaify/Atta
 
 ## Optional
 
+- [Full text](https://docs.mlaify.io/llms-full.txt): Every documentation page in one plain-text file.
 - [AttackMap on mlaify.io](https://mlaify.io/attackmap/): Project overview.
 - [Source and issues](https://github.com/mlaify/AttackMap)
 - [Sitemap](https://docs.mlaify.io/sitemap.xml)
