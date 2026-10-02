@@ -20,6 +20,15 @@ mkdocs serve          # live preview at http://127.0.0.1:8000
 mkdocs build          # output to ./site
 ```
 
+`tests/` checks that code on the site still works against AttackMap core (the
+Analyzer SDK example is extracted from `docs/sdk.md` and run). It needs core in
+the same environment and isn't part of the Cloudflare build:
+
+```bash
+pip install pytest "attackmap @ git+https://github.com/mlaify/AttackMap.git"
+pytest tests/
+```
+
 ## Deploy
 
 Cloudflare **Workers Builds** clones this repo on push, runs the build itself,
