@@ -29,3 +29,6 @@ jobs:
             --exclude-path site
             "docs/**/*.md" README.md
           fail: true
+          # Authenticated requests: github.com answers anonymous bulk checks
+          # with 503/429 (first run flagged two valid blob links).
+          token: ${{ secrets.GITHUB_TOKEN }}
