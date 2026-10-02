@@ -72,16 +72,20 @@ shell's `PATH`, then in `/opt/homebrew/bin`, `/usr/local/bin` and
 
 ### Where output goes
 
-The app always runs the CLI with `--format all` and writes into the scanned
-repo:
+The app always runs the CLI with `--format all` and writes **outside** the
+scanned repo, so a scan never shows up in `git status`:
 
-- single repo: `<repo>/.attackmap-gui/reports/`
-- fleet scan: `<first selected repo>/.attackmap-gui/fleet/` (one subdirectory
-  per repo plus `fleet-summary.json` / `.md`)
+- single repo: `~/Library/Application Support/AttackMap/scans/<repo>-<hash>/reports/`
+- fleet scan: `~/Library/Application Support/AttackMap/scans/fleet-<first repo>-<hash>/fleet/`
+  (one subdirectory per repo plus `fleet-summary.json` / `.md`)
 
-These are ordinary AttackMap reports, the same files `attackmap analyze -o`
-writes. Add `.attackmap-gui/` to your `.gitignore`. AttackMap never scans its
-own output, and watch mode ignores it.
+The hash is derived from the repo path (or the set of fleet repos), so rescans of
+the same repo reuse one directory. **Reveal Reports** in the status bar opens it
+in Finder. These are ordinary AttackMap reports, the same files
+`attackmap analyze -o` writes.
+
+App versions before the next release (0.2.2 and earlier) wrote into
+`<repo>/.attackmap-gui/` instead; that directory can be deleted.
 
 ### CLI versions
 
