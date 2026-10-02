@@ -28,8 +28,10 @@ See [AI review](llm.md) for how backends and credentials resolve.
 
 ## Optional: everything
 
-The `all` extra adds every official ecosystem analyzer plugin up front (they
-also auto-install on demand — see [Analyzers](analyzers.md)):
+The `all` extra adds all 15 official ecosystem analyzer plugins up front,
+pinned to the commits in AttackMap's plugin lock. Without it, a plain
+`attackmap analyze` never installs plugins; use `attackmap suggest . --install`
+or `--module <name>` (see [Analyzers](analyzers.md#installing-plugins)):
 
 ```bash
 pip install "attackmap[all] @ git+https://github.com/mlaify/AttackMap.git"
