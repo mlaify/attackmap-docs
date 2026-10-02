@@ -1,0 +1,19 @@
+# AttackMap documentation — M&L AI security contacts and policy
+
+# Our security contact channels
+Contact: mailto:security@mlaify.io
+
+# If practical, use PGP encryption
+Encryption: https://mlaify.io/publickey.security.mlaify.io-092c3731c4f7015d9fa12ceef773a39417604afb.asc
+
+# Link to our vulnerability disclosure policy
+Policy: https://mlaify.io/security/
+
+# The canonical location of this file
+Canonical: https://docs.mlaify.io/.well-known/security.txt
+
+# Languages that our team speaks and understands
+Preferred-Languages: en-US
+
+# Expiration date for this security.txt file
+Expires: 2027-05-09T00:00:00Z
