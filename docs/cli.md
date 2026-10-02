@@ -28,7 +28,7 @@ invocation is unchanged; the single-repo-only options below (diff, `--llm`,
 | --- | --- |
 | `--output <dir>` / `-o` | Directory for artifacts (default: `reports`). |
 | `--format {all,markdown,json}` | Which artifacts to write (default `all`). `json` = `attackmap-report.json`, `attackmap-report.sarif`, `defensive-review.json`, `review-context-pack.json` (fleet: `fleet-summary.json`). `markdown` = the `*.md` reports plus `*.dot` diagrams (fleet: `fleet-summary.md`, `fleet-graph.md`). Opt-in outputs (baseline diff, PR comment, LLM passes) are always written. Honored from 0.4.30; earlier versions always wrote everything. |
-| `--progress-format {auto,json,none}` | Progress reporting; `json` = NDJSON events on stderr. |
+| `--progress-format {auto,tty,json,none}` | Progress reporting (default `auto`): `auto` = a bar when stderr is a terminal, `tty` = always the bar, `json` = NDJSON events on stderr, `none` = off. |
 | `--no-progress` | Disable the progress bar (equivalent to `none`). |
 
 ### Analyzers
@@ -98,6 +98,10 @@ See [AI review](llm.md) for details and credential resolution.
 | `--pr-comment <file>` | Write a Markdown PR summary comment. |
 | `--no-suppress` | Ignore all suppressions (baseline + inline) for a full audit. |
 | `--suppress-file <file>` | Override the `.attackmap-suppress.yaml` location. |
+| `--suppress-from-ref <ref>` | Trust only suppressions that already exist at this git ref, such as the PR's base branch. Suppress-file entries and inline directives added since then are reported as *pending* and not applied (after 0.4.31). |
+| `--allow-pr-suppressions` | With `--suppress-from-ref`, apply suppressions added since the ref anyway. They are still listed (after 0.4.31). |
+| `--strict-suppressions` | Exit 2 if any suppression has expired (past its `expires:` / `until=` date) (after 0.4.31). |
+| `--fail-on-new-suppression` | Exit non-zero if a finding that was active in the baseline is suppressed in this run, for example by a suppression the PR added. Needs `--baseline` (after 0.4.31). |
 
 See [Suppressing findings](ci.md#suppressing-findings) for the suppression file
 format and inline `attackmap:ignore` directives.

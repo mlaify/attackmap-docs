@@ -23,7 +23,10 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check -r requirements.txt pytest \
             "attackmap[all] @ git+https://github.com/mlaify/AttackMap.git"
-      - name: Build the site
-        run: mkdocs build --strict
-      - name: Run docs tests
+      - name: Build the site (same steps as the Cloudflare build:cf)
+        run: |
+          mkdocs build --strict
+          find site -name '*.map' -delete
+          bash scripts/check-build.sh
+      - name: Run docs tests (SDK example, analyzers table, CLI reference drift)
         run: pytest tests/
