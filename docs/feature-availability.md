@@ -60,3 +60,4 @@ release after 0.4.31.
 | Trusted suppressions | `--suppress-from-ref`, `--allow-pr-suppressions` |
 | Suppression expiry gate | `--strict-suppressions` |
 | Newly-suppressed gate | `--fail-on-new-suppression` |
+| Secrets in git history | `--secrets-history N` |

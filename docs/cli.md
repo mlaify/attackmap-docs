@@ -60,6 +60,7 @@ matching analyzer and abort on the first failure.
 | Option | Description |
 | --- | --- |
 | `--cve` | Cross-reference the SBOM against OSV.dev (network; 24h cache). |
+| `--secrets-history N` | Also scan the patches of the last N commits (all refs) for hard-coded secrets, reporting the introducing commit and whether each is still in `HEAD`. Off by default (`0`); capped at 5000 commits and 64 MB of patch text. Git runs with hooks, pagers, external diff and textconv disabled. |
 
 ### Recall / discovery
 
