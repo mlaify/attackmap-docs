@@ -27,7 +27,7 @@ invocation is unchanged; the single-repo-only options below (diff, `--llm`,
 | Option | Description |
 | --- | --- |
 | `--output <dir>` / `-o` | Directory for artifacts (default: `reports`). |
-| `--format {all,markdown,json}` | Which artifacts to write (default `all`). `json` = `attackmap-report.json`, `attackmap-report.sarif`, `defensive-review.json`, `review-context-pack.json` (fleet: `fleet-summary.json`). `markdown` = the `*.md` reports plus `*.dot` diagrams (fleet: `fleet-summary.md`, `fleet-graph.md`). Opt-in outputs (baseline diff, PR comment, LLM passes) are always written. Honored from 0.4.30; earlier versions always wrote everything. |
+| `--format {all,markdown,json}` | Which artifacts to write (default `all`). `json` = `attackmap-report.json`, `attackmap-report.sarif`, `defensive-review.json`, `review-context-pack.json`, and the generated Sigma rules in `attackmap-detections/*.yml` with an `index.json` (written only into a folder AttackMap created) (unreleased, #251) (fleet: `fleet-summary.json`). `markdown` = the `*.md` reports plus `*.dot` diagrams (fleet: `fleet-summary.md`, `fleet-graph.md`). Opt-in outputs (baseline diff, PR comment, LLM passes) are always written. Honored from 0.4.30; earlier versions always wrote everything. |
 | `--progress-format {auto,tty,json,none}` | Progress reporting (default `auto`): `auto` = a bar when stderr is a terminal, `tty` = always the bar, `json` = NDJSON events on stderr, `none` = off. |
 | `--no-progress` | Disable the progress bar (equivalent to `none`). |
 
