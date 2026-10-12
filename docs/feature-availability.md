@@ -61,3 +61,4 @@ release after 0.4.31.
 | Suppression expiry gate | `--strict-suppressions` |
 | Newly-suppressed gate | `--fail-on-new-suppression` |
 | Secrets in git history | `--secrets-history N` |
+| Deployable Sigma rules for detection opportunities, with a detection-coverage table | `detection_opportunities[].sigma` in `defensive-review.json` (schema 1.5.0); `detections/*.yml` with `--format json` or `all` |
