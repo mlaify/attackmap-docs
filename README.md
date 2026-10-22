@@ -39,7 +39,7 @@ workflow, no SSH key, no rsync, and no origin server.
 |---|---|
 | Worker | `docs-mlaify-io` |
 | Config | [`wrangler.jsonc`](wrangler.jsonc) |
-| Production branch | `main` → `https://docs.mlaify.io` (also served, not redirected, at `docs.fhrp.org`, `docs.matthewd.xyz`, and `docs.mldavis.me`) |
+| Production branch | `main` → `https://docs.mlaify.io` (also served, not redirected, at `docs.fhrp.org`, `docs.matthewd.xyz`, `docs.mldavis.me`, and `docs.tffhrtp.org`) |
 | Any other branch | built and uploaded as a version; no public preview URL, not promoted to production |
 
 This repo previously published to GitHub Pages via `mkdocs gh-deploy`, then to an
